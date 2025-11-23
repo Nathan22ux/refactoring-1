@@ -13,8 +13,8 @@ import java.util.Map;
  * This class generates a statement for a given invoice of performances.
  */
 public class StatementPrinter {
-    public Invoice invoice;
-    public Map<String, Play> plays;
+    private final Invoice invoice;
+    private final Map<String, Play> plays;
 
     public StatementPrinter(Invoice invoice, Map<String, Play> plays) {
         this.invoice = invoice;
@@ -34,22 +34,17 @@ public class StatementPrinter {
 
         NumberFormat frmt = NumberFormat.getCurrencyInstance(Locale.US);
 
-        for (Performance p : invoice.getPerformances()) {
-            Play play = plays.get(p.playID);
+        for (Performance performance : invoice.getPerformances()) {
 
-            int thisAmount = amountFor(p, play);
+            volumeCredits += volumeCreditsFor(performance, getPlay(performance));
 
-            // add volume credits
-            volumeCredits += volumeCreditsFor(p, play);
-
-            // print line for this order
             result.append(String.format(
                     "  %s: %s (%s seats)%n",
-                    play.name,
-                    frmt.format(thisAmount / 100),
-                    p.audience));
+                    getPlay(performance).name,
+                    frmt.format(getAmount(performance) / 100),
+                    performance.audience));
 
-            totalAmount += thisAmount;
+            totalAmount += getAmount(performance);
         }
 
         result.append(String.format("Amount owed is %s%n", frmt.format(totalAmount / 100)));
@@ -57,35 +52,40 @@ public class StatementPrinter {
         return result.toString();
     }
 
-    private int amountFor(Performance p, Play play) {
-        int thisAmount;
+    private Play getPlay(Performance performance) {
+        return plays.get(performance.playID);
+    }
+
+    private int getAmount(Performance performance) {
+        int result;
+        Play play = getPlay(performance);
         switch (play.type) {
             case "tragedy":
-                thisAmount = 40000;
-                if (p.audience > Constants.TRAGEDY_AUDIENCE_THRESHOLD) {
-                    thisAmount += 1000 * (p.audience - 30);
+                result = 40000;
+                if (performance.audience > Constants.TRAGEDY_AUDIENCE_THRESHOLD) {
+                    result += 1000 * (performance.audience - 30);
                 }
                 break;
             case "comedy":
-                thisAmount = Constants.COMEDY_BASE_AMOUNT;
-                if (p.audience > Constants.COMEDY_AUDIENCE_THRESHOLD) {
-                    thisAmount += Constants.COMEDY_OVER_BASE_CAPACITY_AMOUNT
+                result = Constants.COMEDY_BASE_AMOUNT;
+                if (performance.audience > Constants.COMEDY_AUDIENCE_THRESHOLD) {
+                    result += Constants.COMEDY_OVER_BASE_CAPACITY_AMOUNT
                             + (Constants.COMEDY_OVER_BASE_CAPACITY_PER_PERSON
-                            * (p.audience - Constants.COMEDY_AUDIENCE_THRESHOLD));
+                            * (performance.audience - Constants.COMEDY_AUDIENCE_THRESHOLD));
                 }
-                thisAmount += Constants.COMEDY_AMOUNT_PER_AUDIENCE * p.audience;
+                result += Constants.COMEDY_AMOUNT_PER_AUDIENCE * performance.audience;
                 break;
             default:
                 throw new RuntimeException(String.format("unknown type: %s", play.type));
         }
-        return thisAmount;
+        return result;
     }
 
-    private int volumeCreditsFor(Performance p, Play play) {
-        int credits = Math.max(p.audience - Constants.BASE_VOLUME_CREDIT_THRESHOLD, 0);
+    private int volumeCreditsFor(Performance performance, Play play) {
+        int credits = Math.max(performance.audience - Constants.BASE_VOLUME_CREDIT_THRESHOLD, 0);
         // add extra credit for every five comedy attendees
         if ("comedy".equals(play.type)) {
-            credits += p.audience / Constants.COMEDY_EXTRA_VOLUME_FACTOR;
+            credits += performance.audience / Constants.COMEDY_EXTRA_VOLUME_FACTOR;
         }
         return credits;
     }
