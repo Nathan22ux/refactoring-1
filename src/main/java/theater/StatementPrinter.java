@@ -1,10 +1,5 @@
 package theater;
 
-import theater.Constants;
-import theater.Invoice;
-import theater.Performance;
-import theater.Play;
-
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Map;
@@ -27,12 +22,12 @@ public class StatementPrinter {
      * @throws RuntimeException if one of the play types is not known
      */
     public String statement() {
-        StatementData statementData = new StatementData(invoice, plays);
+        final StatementData statementData = new StatementData(invoice, plays);
         return renderPlainText(statementData);
     }
 
     private String renderPlainText(StatementData statementData) {
-        StringBuilder result =
+        final StringBuilder result =
                 new StringBuilder("Statement for " + statementData.getCustomer() + System.lineSeparator());
 
         for (Performance performance : statementData.getPerformances()) {
@@ -40,21 +35,19 @@ public class StatementPrinter {
                     "  %s: %s (%s seats)%n",
                     statementData.getPlayName(performance),
                     usd(statementData.getAmount(performance)),
-                    performance.audience));
+                    performance.getAudience()));
         }
 
-        int totalAmount = statementData.getTotalAmount();
-
-        int volumeCredits = statementData.getVolumeCredits();
+        final int totalAmount = statementData.getTotalAmount();
+        final int volumeCredits = statementData.getVolumeCredits();
 
         result.append(String.format("Amount owed is %s%n", usd(totalAmount)));
         result.append(String.format("You earned %s credits%n", volumeCredits));
         return result.toString();
     }
 
-
     protected String usd(int amount) {
-        return NumberFormat.getCurrencyInstance(Locale.US).format(amount / 100);
+        return NumberFormat.getCurrencyInstance(Locale.US).format(amount / Constants.PERCENT_FACTOR);
     }
 
     protected Invoice getInvoice() {
@@ -64,8 +57,4 @@ public class StatementPrinter {
     protected Map<String, Play> getPlays() {
         return plays;
     }
-
-
-
-
 }

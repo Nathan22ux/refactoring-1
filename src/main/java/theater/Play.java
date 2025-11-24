@@ -1,9 +1,11 @@
 package theater;
 
+/**
+ * Represents a theatrical play with a name and type.
+ */
 public class Play {
-
-    public String name;
-    public String type;
+    private final String name;
+    private final String type;
 
     public Play(String name, String type) {
         this.name = name;
@@ -12,5 +14,9 @@ public class Play {
 
     public String getName() {
         return name;
+    }
+
+    public String getType() {
+        return type;
     }
 }
