@@ -6,6 +6,7 @@ import java.util.Map;
 
 //Task 1.1
 //Task 1.2
+//Task 2.1
 public class StatementData {
     private final Map<String, Play> plays;
     private final Invoice invoice;
