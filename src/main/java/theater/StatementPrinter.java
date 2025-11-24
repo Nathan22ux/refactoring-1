@@ -28,10 +28,10 @@ public class StatementPrinter {
      */
     public String statement() {
         StatementData statementData = new StatementData(invoice, plays);
-        return getString(statementData);
+        return renderPlainText(statementData);
     }
 
-    private String getString(StatementData statementData) {
+    private String renderPlainText(StatementData statementData) {
         StringBuilder result =
                 new StringBuilder("Statement for " + statementData.getCustomer() + System.lineSeparator());
 
@@ -51,8 +51,6 @@ public class StatementPrinter {
         result.append(String.format("You earned %s credits%n", volumeCredits));
         return result.toString();
     }
-
-
 
 
     private String usd(int amount) {
