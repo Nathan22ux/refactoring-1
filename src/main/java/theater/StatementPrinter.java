@@ -53,8 +53,16 @@ public class StatementPrinter {
     }
 
 
-    private String usd(int amount) {
+    protected String usd(int amount) {
         return NumberFormat.getCurrencyInstance(Locale.US).format(amount / 100);
+    }
+
+    protected Invoice getInvoice() {
+        return invoice;
+    }
+
+    protected Map<String, Play> getPlays() {
+        return plays;
     }
 
 
