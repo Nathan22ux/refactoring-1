@@ -3,6 +3,8 @@ package theater;
 import java.util.List;
 import java.util.Map;
 
+
+//Task 1.1
 public class StatementData {
     private final Map<String, Play> plays;
     private final Invoice invoice;
